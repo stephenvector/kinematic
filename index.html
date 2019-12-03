@@ -1,0 +1,71 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <style type="text/css">
+      *,
+      *:before,
+      *:after {
+        box-sizing: border-box;
+      }
+      html {
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        background: #fff;
+      }
+      canvas {
+        background: #f2f2f2;
+        height: 300px;
+        width: 300px;
+        margin: 2rem auto;
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas width="300" height="300" id="canvas"></canvas>
+    <script type="text/javascript">
+      const canvas = document.getElementById("canvas");
+      const canvasWidth = 300;
+      const canvasHeight = 300;
+      const RPM = 10;
+      const cycleTime = (60 * 1000) / RPM; // In milliseconds
+      let lastTime = 0;
+      let cyclePosition = 0;
+
+      function draw() {
+        const ctx = canvas.getContext("2d");
+        const now = new Date().valueOf();
+
+        if (lastTime === 0) {
+          console.log("what");
+          lastTime = now;
+        }
+
+        cyclePosition += now - lastTime;
+        cyclePosition = cyclePosition % cycleTime;
+        lastTime = now;
+
+        const pathLengths = [100, 140, 40];
+
+        const rotation = 2 * Math.PI * (cyclePosition / cycleTime);
+
+        ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+
+        ctx.beginPath();
+        ctx.moveTo(canvasWidth / 2, canvasHeight / 2);
+        ctx.lineTo(
+          Math.cos(rotation) * 100 + canvasWidth / 2,
+          Math.sin(rotation) * 100 + canvasHeight / 2
+        );
+        ctx.closePath();
+        ctx.stroke();
+
+        window.requestAnimationFrame(draw);
+      }
+
+      window.requestAnimationFrame(draw);
+    </script>
+  </body>
+</html>
