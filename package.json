@@ -1,8 +1,26 @@
 {
   "scripts": {
-    "build": "tsc"
+    "build": "webpack",
+    "dev": "webpack serve"
   },
   "devDependencies": {
-    "typescript": "^4.2.4"
-  }
+    "@babel/preset-react": "^7.13.13",
+    "@babel/preset-typescript": "^7.13.0",
+    "@types/react": "^17.0.3",
+    "@types/react-dom": "^17.0.3",
+    "babel-loader": "^8.2.2",
+    "clean-webpack-plugin": "^4.0.0-alpha.0",
+    "html-webpack-plugin": "^5.3.1",
+    "prettier": "^2.2.1",
+    "typescript": "^4.2.4",
+    "webpack": "^5.31.2",
+    "webpack-cli": "^4.6.0",
+    "webpack-dev-server": "^3.11.2"
+  },
+  "dependencies": {
+    "@babel/preset-env": "^7.13.15",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2"
+  },
+  "prettier": {}
 }
