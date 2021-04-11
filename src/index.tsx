@@ -38,9 +38,8 @@ function distanceBetweenPoints(pointA: Point, pointB: Point): number {
   );
 }
 
-const RPM = 10;
+const RPM = 3;
 const RADIANS_PER_SECOND = rpmToRadiansPerSecond(RPM);
-const CYCLE_TIME = (60 * 1000) / RPM; // In milliseconds
 
 const FIXED_LINK: FixedLink = {
   x: 100,
@@ -87,18 +86,6 @@ function drawCircle(
   );
   ctx.closePath();
   ctx.stroke();
-}
-
-function getPointRelativeToOriginPoint(
-  origin: Point,
-  otherPoint: Point
-): Point {
-  const x = otherPoint.x - origin.x;
-  //   origin.x > otherPoint.x ? otherPoint.x - origin.x : origin.x - otherPoint.x;
-  const y = otherPoint.y - origin.y;
-  // origin.y > otherPoint.y ? otherPoint.y - origin.y : origin.y - otherPoint.y;
-
-  return { x, y };
 }
 
 const App: React.FC = () => {
@@ -177,11 +164,14 @@ const App: React.FC = () => {
     );
 
     const tiltAngle = Math.atan2(crankY - FIXED_LINK.y, crankX - FIXED_LINK.x);
+
+    ctx.fillText(`${(tiltAngle * 180) / Math.PI}`, 50, 50);
+
     drawLine(
       ctx,
       {
-        x: Math.cos(tiltAngle) * FIXED_LINK.length,
-        y: Math.sin(tiltAngle) * FIXED_LINK.length,
+        x: FIXED_LINK.x + Math.cos(tiltAngle) * FIXED_LINK.length,
+        y: FIXED_LINK.y + Math.sin(tiltAngle) * FIXED_LINK.length,
       },
       { x: FIXED_LINK.x, y: FIXED_LINK.y }
     );
@@ -193,18 +183,27 @@ const App: React.FC = () => {
     //   )
     // );
 
-    const c = distanceBetweenPoints(
+    const distanceBetweenCrankEndAndFixedLinkCenterPoint = distanceBetweenPoints(
       { x: crankX, y: crankY },
       { x: FIXED_LINK.x, y: FIXED_LINK.y }
     );
 
-    console.log(
-      Math.asin(
-        (Math.pow(FIXED_LINK.length, 2) +
-          Math.pow(CONNECTING_LINK.length, 2) -
-          Math.pow(c, 2)) /
-          (2 * FIXED_LINK.length * CONNECTING_LINK.length)
-      )
+    const otherAngle = Math.asin(
+      (Math.pow(FIXED_LINK.length, 2) +
+        Math.pow(CONNECTING_LINK.length, 2) -
+        Math.pow(distanceBetweenCrankEndAndFixedLinkCenterPoint, 2)) /
+        (2 * FIXED_LINK.length * CONNECTING_LINK.length)
+    );
+
+    ctx.fillText(`${(otherAngle * 180) / Math.PI}`, 50, 100);
+
+    drawLine(
+      ctx,
+      {
+        x: crankX + Math.cos(otherAngle - tiltAngle) * CONNECTING_LINK.length,
+        y: crankY + Math.sin(otherAngle - tiltAngle) * CONNECTING_LINK.length,
+      },
+      { x: crankX, y: crankY }
     );
 
     setCrank({
