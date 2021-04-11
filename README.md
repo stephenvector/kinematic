@@ -6,6 +6,7 @@ const newOffsetAngle =
   (2 * Math.PI);
 ```
 
-## Useful Links
+## Terminology
 
-- https://math.stackexchange.com/questions/256100/how-can-i-find-the-points-at-which-two-circles-intersect
+- Crank
+- Revolute Joint
