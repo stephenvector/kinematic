@@ -38,8 +38,30 @@ function distanceBetweenPoints(pointA: Point, pointB: Point): number {
   );
 }
 
-const RPM = 3;
-const RADIANS_PER_SECOND = rpmToRadiansPerSecond(RPM);
+// const RPM = 3;
+// const RADIANS_PER_SECOND = rpmToRadiansPerSecond(RPM);
+
+type RangeProps = {
+  value: number;
+  onChange: (newValue: number) => void;
+};
+
+const Range: React.FC<RangeProps> = ({ value, onChange }) => {
+  return (
+    <div>
+      <input
+        type="range"
+        value={value}
+        min="1"
+        max="60"
+        onChange={(e) => {
+          console.log(parseInt(e.target.value));
+          onChange(parseInt(e.target.value));
+        }}
+      />
+    </div>
+  );
+};
 
 const FIXED_LINK: FixedLink = {
   x: 100,
@@ -92,6 +114,7 @@ const App: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [lastTime, setLastTime] = useState(() => Date.now());
   const [crank, setCrank] = useState(() => CRANK);
+  const [rpm, setRpm] = useState(5);
 
   const draw = useCallback(() => {
     const canvas = canvasRef.current;
@@ -132,8 +155,12 @@ const App: React.FC = () => {
     ctx.closePath();
     ctx.stroke();
 
+    console.log(rpm);
+
     const newOffsetAngle =
-      (-1 * (crank.angle + ((now - lastTime) / 1000) * RADIANS_PER_SECOND)) %
+      (-1 *
+        (crank.angle +
+          ((now - lastTime) / 1000) * rpmToRadiansPerSecond(rpm))) %
       (2 * Math.PI);
 
     const crankX = crank.x + Math.cos(newOffsetAngle) * crank.length;
@@ -214,13 +241,23 @@ const App: React.FC = () => {
     setLastTime(now);
 
     window.requestAnimationFrame(draw);
-  }, [lastTime, crank]);
+  }, [lastTime, crank, rpm]);
 
   useEffect(() => {
     window.requestAnimationFrame(draw);
   }, []);
 
-  return <canvas ref={canvasRef} />;
+  return (
+    <div>
+      <canvas ref={canvasRef} />
+      <Range
+        value={rpm}
+        onChange={(newValue) => {
+          setRpm(newValue);
+        }}
+      />
+    </div>
+  );
 };
 
 ReactDOM.render(<App />, document.getElementById("root"));
