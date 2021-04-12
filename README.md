@@ -10,3 +10,7 @@ const newOffsetAngle =
 
 - Crank
 - Revolute Joint
+
+## Useful Links
+
+- https://css-tricks.com/using-requestanimationframe-with-react-hooks/
