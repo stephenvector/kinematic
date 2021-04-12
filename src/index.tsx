@@ -6,11 +6,6 @@ type Point = {
   y: number;
 };
 
-type Circle = {
-  center: Point;
-  radius: number;
-};
-
 type Crank = {
   x: number;
   y: number;
@@ -37,9 +32,6 @@ function distanceBetweenPoints(pointA: Point, pointB: Point): number {
     Math.pow(pointB.x - pointA.x, 2) + Math.pow(pointB.y - pointA.y, 2)
   );
 }
-
-// const RPM = 3;
-// const RADIANS_PER_SECOND = rpmToRadiansPerSecond(RPM);
 
 type RangeProps = {
   value: number;
@@ -114,9 +106,10 @@ const App: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [lastTime, setLastTime] = useState(() => Date.now());
   const [crank, setCrank] = useState(() => CRANK);
-  const [rpm, setRpm] = useState(5);
+  const [rpm, setRpm] = useState(15);
 
   const draw = useCallback(() => {
+    console.log(rpm);
     const canvas = canvasRef.current;
 
     if (!canvas) {
@@ -154,8 +147,6 @@ const App: React.FC = () => {
     ctx.lineTo(canvas.width, canvas.height / 2);
     ctx.closePath();
     ctx.stroke();
-
-    console.log(rpm);
 
     const newOffsetAngle =
       (-1 *
