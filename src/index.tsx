@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import ReactDOM from "react-dom";
 
 type Point = {
@@ -47,7 +47,6 @@ const Range: React.FC<RangeProps> = ({ value, onChange }) => {
         min="1"
         max="60"
         onChange={(e) => {
-          console.log(parseInt(e.target.value));
           onChange(parseInt(e.target.value));
         }}
       />
@@ -104,12 +103,12 @@ function drawCircle(
 
 const App: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const animationFrameRef = useRef<number>();
   const [lastTime, setLastTime] = useState(() => Date.now());
   const [crank, setCrank] = useState(() => CRANK);
-  const [rpm, setRpm] = useState(() => 15);
+  const rpm = useRef(12);
 
-  function draw() {
-    console.log(rpm);
+  const draw = () => {
     const canvas = canvasRef.current;
 
     if (!canvas) {
@@ -151,7 +150,7 @@ const App: React.FC = () => {
     const newOffsetAngle =
       (-1 *
         (crank.angle +
-          ((now - lastTime) / 1000) * rpmToRadiansPerSecond(rpm))) %
+          ((now - lastTime) / 1000) * rpmToRadiansPerSecond(rpm.current))) %
       (2 * Math.PI);
 
     const crankX = crank.x + Math.cos(newOffsetAngle) * crank.length;
@@ -194,13 +193,6 @@ const App: React.FC = () => {
       { x: FIXED_LINK.x, y: FIXED_LINK.y }
     );
 
-    // console.log(
-    //   distanceBetweenPoints(
-    //     { x: crankX, y: crankY },
-    //     { x: FIXED_LINK.x, y: FIXED_LINK.y }
-    //   )
-    // );
-
     const distanceBetweenCrankEndAndFixedLinkCenterPoint = distanceBetweenPoints(
       { x: crankX, y: crankY },
       { x: FIXED_LINK.x, y: FIXED_LINK.y }
@@ -231,17 +223,25 @@ const App: React.FC = () => {
 
     setLastTime(now);
 
-    window.requestAnimationFrame(draw);
-  }
+    animationFrameRef.current = window.requestAnimationFrame(draw);
+  };
 
   useEffect(() => {
-    window.requestAnimationFrame(draw);
+    animationFrameRef.current = window.requestAnimationFrame(draw);
+    return () => {
+      if (animationFrameRef.current) {
+        window.cancelAnimationFrame(animationFrameRef.current);
+      }
+    };
   }, []);
 
   return (
     <div>
       <canvas ref={canvasRef} />
-      <Range value={rpm} onChange={setRpm} />
+      <Range
+        value={rpm.current}
+        onChange={(newValue: number) => (rpm.current = newValue)}
+      />
     </div>
   );
 };
