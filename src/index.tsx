@@ -106,9 +106,9 @@ const App: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [lastTime, setLastTime] = useState(() => Date.now());
   const [crank, setCrank] = useState(() => CRANK);
-  const [rpm, setRpm] = useState(15);
+  const [rpm, setRpm] = useState(() => 15);
 
-  const draw = useCallback(() => {
+  function draw() {
     console.log(rpm);
     const canvas = canvasRef.current;
 
@@ -232,7 +232,7 @@ const App: React.FC = () => {
     setLastTime(now);
 
     window.requestAnimationFrame(draw);
-  }, [lastTime, crank, rpm]);
+  }
 
   useEffect(() => {
     window.requestAnimationFrame(draw);
@@ -241,12 +241,7 @@ const App: React.FC = () => {
   return (
     <div>
       <canvas ref={canvasRef} />
-      <Range
-        value={rpm}
-        onChange={(newValue) => {
-          setRpm(newValue);
-        }}
-      />
+      <Range value={rpm} onChange={setRpm} />
     </div>
   );
 };
