@@ -74,7 +74,6 @@ const CONNECTING_LINK: Link = {
 function drawLine(ctx: CanvasRenderingContext2D, pointA: Point, pointB: Point) {
   const canvas = ctx.canvas;
   ctx.beginPath();
-  ctx.fillStyle = "#fff";
   ctx.moveTo(pointA.x + canvas.width / 2, pointA.y * -1 + canvas.height / 2);
   ctx.lineTo(pointB.x + canvas.width / 2, pointB.y * -1 + canvas.height / 2);
   ctx.closePath();
@@ -88,7 +87,6 @@ function drawCircle(
 ) {
   const canvas = ctx.canvas;
   ctx.beginPath();
-  ctx.fillStyle = "#fff";
   ctx.arc(
     point.x + canvas.width / 2,
     point.y * -1 + canvas.height / 2,
@@ -133,7 +131,6 @@ const App: React.FC = () => {
 
     // Draw X axis
     ctx.beginPath();
-    ctx.strokeStyle = "rgba(255,255,255,.3)";
     ctx.moveTo(canvas.width / 2, 0);
     ctx.lineTo(canvas.width / 2, canvas.height);
     ctx.closePath();
@@ -141,7 +138,6 @@ const App: React.FC = () => {
 
     // Draw Y axis
     ctx.beginPath();
-    ctx.strokeStyle = "rgba(255,255,255,.3)";
     ctx.moveTo(0, canvas.height / 2);
     ctx.lineTo(canvas.width, canvas.height / 2);
     ctx.closePath();
