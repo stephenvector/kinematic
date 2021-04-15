@@ -33,6 +33,10 @@ function distanceBetweenPoints(pointA: Point, pointB: Point): number {
   );
 }
 
+function radiansToDegrees(radians: number) {
+  return (radians * 180) / Math.PI;
+}
+
 type RangeProps = {
   value: number;
   onChange: (newValue: number) => void;
@@ -99,6 +103,28 @@ function drawCircle(
   ctx.stroke();
 }
 
+function maximum(values: number[]) {
+  let max = values[0];
+  values.forEach((value) => {
+    if (value > max) {
+      max = value;
+    }
+  });
+
+  return max;
+}
+
+function minimum(values: number[]) {
+  let min = values[0];
+  values.forEach((value) => {
+    if (value < min) {
+      min = value;
+    }
+  });
+
+  return min;
+}
+
 const App: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animationFrameRef = useRef<number>();
@@ -152,22 +178,22 @@ const App: React.FC = () => {
     const crankX = crank.x + Math.cos(newOffsetAngle) * crank.length;
     const crankY = crank.y + Math.sin(newOffsetAngle) * crank.length;
 
-    drawCircle(ctx, crank.length, { x: crank.x, y: crank.y });
+    // drawCircle(ctx, crank.length, { x: crank.x, y: crank.y });
 
-    drawCircle(ctx, FIXED_LINK.length, {
-      x: FIXED_LINK.x,
-      y: FIXED_LINK.y,
-    });
+    // drawCircle(ctx, FIXED_LINK.length, {
+    //   x: FIXED_LINK.x,
+    //   y: FIXED_LINK.y,
+    // });
 
-    drawCircle(ctx, CONNECTING_LINK.length, {
-      x: crankX,
-      y: crankY,
-    });
+    // drawCircle(ctx, CONNECTING_LINK.length, {
+    //   x: crankX,
+    //   y: crankY,
+    // });
 
     // Draw the crank
     drawLine(ctx, { x: crank.x, y: crank.y }, { x: crankX, y: crankY });
-    drawCircle(ctx, 3, { x: crank.x, y: crank.y });
-    drawCircle(ctx, 3, { x: crankX, y: crankY });
+    // drawCircle(ctx, 3, { x: crank.x, y: crank.y });
+    // drawCircle(ctx, 3, { x: crankX, y: crankY });
 
     // Draw line from end of crank to center of fixed crank
     drawLine(
@@ -180,37 +206,138 @@ const App: React.FC = () => {
 
     ctx.fillText(`${(tiltAngle * 180) / Math.PI}`, 50, 50);
 
-    drawLine(
-      ctx,
-      {
-        x: FIXED_LINK.x + Math.cos(tiltAngle) * FIXED_LINK.length,
-        y: FIXED_LINK.y + Math.sin(tiltAngle) * FIXED_LINK.length,
-      },
-      { x: FIXED_LINK.x, y: FIXED_LINK.y }
-    );
+    // drawLine(
+    //   ctx,
+    //   {
+    //     x: FIXED_LINK.x + Math.cos(tiltAngle) * FIXED_LINK.length,
+    //     y: FIXED_LINK.y + Math.sin(tiltAngle) * FIXED_LINK.length,
+    //   },
+    //   { x: FIXED_LINK.x, y: FIXED_LINK.y }
+    // );
 
     const distanceBetweenCrankEndAndFixedLinkCenterPoint = distanceBetweenPoints(
       { x: crankX, y: crankY },
       { x: FIXED_LINK.x, y: FIXED_LINK.y }
     );
 
-    const otherAngle = Math.asin(
-      (Math.pow(FIXED_LINK.length, 2) +
-        Math.pow(CONNECTING_LINK.length, 2) -
-        Math.pow(distanceBetweenCrankEndAndFixedLinkCenterPoint, 2)) /
-        (2 * FIXED_LINK.length * CONNECTING_LINK.length)
-    );
+    if (
+      distanceBetweenCrankEndAndFixedLinkCenterPoint > FIXED_LINK.length &&
+      distanceBetweenCrankEndAndFixedLinkCenterPoint > CONNECTING_LINK.length
+    ) {
+      const angleOne = Math.asin(
+        FIXED_LINK.length / distanceBetweenCrankEndAndFixedLinkCenterPoint
+      );
 
-    ctx.fillText(`${(otherAngle * 180) / Math.PI}`, 50, 100);
+      const angleTwo = Math.acos(
+        CONNECTING_LINK.length / distanceBetweenCrankEndAndFixedLinkCenterPoint
+      );
 
-    drawLine(
-      ctx,
-      {
-        x: crankX + Math.cos(otherAngle - tiltAngle) * CONNECTING_LINK.length,
-        y: crankY + Math.sin(otherAngle - tiltAngle) * CONNECTING_LINK.length,
-      },
-      { x: crankX, y: crankY }
-    );
+      console.log(
+        radiansToDegrees(angleOne),
+        radiansToDegrees(angleTwo),
+        radiansToDegrees(Math.PI * 2 - angleOne - angleTwo)
+      );
+      console.log("------------");
+
+      const offset = 50;
+      drawLine(
+        ctx,
+        { x: offset, y: offset },
+        {
+          x: offset + Math.cos(angleOne) * CONNECTING_LINK.length,
+          y: offset + Math.sin(angleOne) * CONNECTING_LINK.length,
+        }
+      );
+
+      drawLine(
+        ctx,
+        { x: offset, y: offset },
+        {
+          x: offset + distanceBetweenCrankEndAndFixedLinkCenterPoint,
+          y: offset,
+        }
+      );
+
+      drawLine(
+        ctx,
+        {
+          x: offset + Math.cos(angleOne) * CONNECTING_LINK.length,
+          y: offset + Math.sin(angleOne) * CONNECTING_LINK.length,
+        },
+        {
+          x: offset + distanceBetweenCrankEndAndFixedLinkCenterPoint,
+          y: offset,
+        }
+      );
+    } else {
+      const hypotenuse = maximum([
+        distanceBetweenCrankEndAndFixedLinkCenterPoint,
+        CONNECTING_LINK.length,
+        FIXED_LINK.length,
+      ]);
+      console.log(hypotenuse);
+      const angleOne = Math.acos(
+        distanceBetweenCrankEndAndFixedLinkCenterPoint / hypotenuse
+      );
+
+      const angleTwo = Math.asin(FIXED_LINK.length / CONNECTING_LINK.length);
+
+      console.log(
+        radiansToDegrees(angleOne),
+        radiansToDegrees(angleTwo),
+        radiansToDegrees(Math.PI * 2 - angleOne - angleTwo)
+      );
+      console.log("------------");
+
+      const offset = 50;
+      drawLine(
+        ctx,
+        { x: offset, y: offset },
+        {
+          x: offset + Math.cos(angleOne) * CONNECTING_LINK.length,
+          y: offset + Math.sin(angleOne) * CONNECTING_LINK.length,
+        }
+      );
+
+      drawLine(
+        ctx,
+        { x: offset, y: offset },
+        {
+          x: offset + distanceBetweenCrankEndAndFixedLinkCenterPoint,
+          y: offset,
+        }
+      );
+
+      // drawLine(
+      //   ctx,
+      //   {
+      //     x: offset + Math.cos(angleOne) * CONNECTING_LINK.length,
+      //     y: offset + Math.sin(angleOne) * CONNECTING_LINK.length,
+      //   },
+      //   {
+      //     x: offset + distanceBetweenCrankEndAndFixedLinkCenterPoint,
+      //     y: offset,
+      //   }
+      // );
+    }
+
+    // const otherAngle = Math.asin(
+    //   (Math.pow(FIXED_LINK.length, 2) +
+    //     Math.pow(CONNECTING_LINK.length, 2) -
+    //     Math.pow(distanceBetweenCrankEndAndFixedLinkCenterPoint, 2)) /
+    //     (2 * FIXED_LINK.length * CONNECTING_LINK.length)
+    // );
+
+    // ctx.fillText(`${(otherAngle * 180) / Math.PI}`, 50, 100);
+
+    // drawLine(
+    //   ctx,
+    //   {
+    //     x: crankX + Math.cos(otherAngle - tiltAngle) * CONNECTING_LINK.length,
+    //     y: crankY + Math.sin(otherAngle - tiltAngle) * CONNECTING_LINK.length,
+    //   },
+    //   { x: crankX, y: crankY }
+    // );
 
     setCrank({
       ...crank,
@@ -219,7 +346,9 @@ const App: React.FC = () => {
 
     setLastTime(now);
 
-    animationFrameRef.current = window.requestAnimationFrame(draw);
+    setTimeout(() => {
+      animationFrameRef.current = window.requestAnimationFrame(draw);
+    }, 100);
   };
 
   useEffect(() => {
